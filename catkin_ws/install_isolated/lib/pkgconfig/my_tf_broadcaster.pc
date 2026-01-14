@@ -1,0 +1,8 @@
+prefix=/home/jetson/catkin_ws/install_isolated
+
+Name: my_tf_broadcaster
+Description: Description of my_tf_broadcaster
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

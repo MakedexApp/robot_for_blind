@@ -1,0 +1,8 @@
+prefix=/home/jetson/catkin_ws/devel_isolated/my_tf_broadcaster
+
+Name: my_tf_broadcaster
+Description: Description of my_tf_broadcaster
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

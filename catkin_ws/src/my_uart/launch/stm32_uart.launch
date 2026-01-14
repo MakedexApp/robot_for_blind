@@ -1,0 +1,13 @@
+<launch>
+  <arg name="port" default="/dev/ttyTHS1"/>
+  <arg name="baudrate" default="115200"/>
+
+  <node pkg="my_uart"
+        type="stm32_uart_parser.py"
+        name="stm32_uart_parser"
+        output="screen">
+    <param name="port" value="$(arg port)" />
+    <param name="baudrate" value="$(arg baudrate)" />
+  </node>
+</launch>
+

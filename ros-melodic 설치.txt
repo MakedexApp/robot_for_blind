@@ -1,0 +1,31 @@
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu bionic main" > /etc/apt/sources.list.d/ros-latest.list'
+
+sudo apt update
+
+sudo apt install curl
+curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.key | sudo apt-key add -
+
+
+
+sudo apt update
+sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
+
+
+sudo apt install ros-melodic-desktop-full
+
+
+sudo apt install ros-melodic-rosserial ros-melodic-rviz ros-melodic-tf ros-melodic-rosbag
+
+
+sudo rosdep init
+rosdep update
+
+
+echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+
+
+cd ~/catkin_ws
+catkin_make
+source devel/setup.bash
+

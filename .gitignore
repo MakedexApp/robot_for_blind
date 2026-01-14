@@ -1,0 +1,28 @@
+# build artifacts
+build/
+devel/
+install/
+
+# Python
+__pycache__/
+*.pyc
+
+# Ros logs
+log/
+
+# Models / data
+*.bag
+*.pt
+*.onnx
+*.engine
+data/
+datasets/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# External ROS drivers
+catkin_ws/src/YDLidar-SDK/
+catkin_ws/src/ydlidar_ros_driver/

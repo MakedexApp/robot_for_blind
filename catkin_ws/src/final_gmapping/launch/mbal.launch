@@ -1,0 +1,48 @@
+<launch>
+  <!-- 1. map_server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find final_gmapping)/map/dom_0714.yaml" />
+
+  <!-- 2. YDLidar -->
+  <include file="$(find ydlidar_ros_driver)/launch/X4.launch"/>
+
+  <!-- 3. Encoder UART + Odometry + IMU + EKF -->
+  <node pkg="final_gmapping" type="jetson_uart_flask.py" name="encoder_uart_listener" output="screen">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baudrate" value="115200"/>
+  </node>
+
+  <node pkg="final_gmapping" type="odometry_publisher.py" name="odometry_publisher" output="screen"/>
+  
+  <node pkg="final_gmapping" type="imu_uart_publisher.py" name="imu_uart_publisher" output="screen">
+    <param name="port" value="/dev/ttyACM1"/>
+    <param name="baudrate" value="115200"/>
+  </node>
+
+  <include file="$(find final_gmapping)/launch/ekf.launch"/>
+
+  <!-- 4. AMCL -->
+  <node pkg="amcl" type="amcl" name="amcl" output="screen">
+    <param name="odom_frame_id" value="odom"/>
+    <param name="base_frame_id" value="base_footprint"/>
+    <param name="global_frame_id" value="map"/>
+    <param name="update_min_d" value="0.2"/>
+    <param name="update_min_a" value="0.2"/>
+    <param name="min_particles" value="500"/>
+    <param name="max_particles" value="2000"/>
+    <param name="kld_err" value="0.05"/>
+    <param name="kld_z" value="0.99"/>
+    <param name="resample_interval" value="1"/>
+    <param name="transform_tolerance" value="0.5"/>
+    <param name="recovery_alpha_slow" value="0.0"/>
+    <param name="recovery_alpha_fast" value="0.0"/>
+  </node>
+
+  <!-- 5. Move Base -->
+  <include file="$(find final_gmapping)/launch/move_base.launch"/>
+
+  <!-- base_footprint → base_link : move_base가 base_link를 요구하므로 alias를 추가해줌 -->
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_base_link"
+      args="0 0 0 0 0 0 base_footprint base_link 100"/>
+
+</launch>
+

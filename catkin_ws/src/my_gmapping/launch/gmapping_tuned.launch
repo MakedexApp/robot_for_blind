@@ -1,0 +1,11 @@
+<launch>
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+    <param name="base_frame" value="base_footprint" />
+    <param name="odom_frame" value="odom" />
+    <param name="map_update_interval" value="1.0" />
+    <param name="linearUpdate" value="0.05" />  <!-- ← 5cm만 움직여도 업데이트 -->
+    <param name="angularUpdate" value="0.1" />  <!-- ← 약 5.7도 회전해도 업데이트 -->
+    <param name="minimumScore" value="50" />
+  </node>
+</launch>
+

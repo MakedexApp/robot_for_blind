@@ -1,0 +1,2 @@
+cartographer:cartographer_ros/cartographer_ros:cartographer_ros/cartographer_ros_msgs:cartographer_ros/cartographer_rviz:my_gmapping:my_nav:my_robot_launch:my_tf_broadcaster:slam:ydlidar_ros_driver
+-G Ninja -DCATKIN_DEVEL_PREFIX=/home/jetson/catkin_ws/devel_isolated -DCMAKE_INSTALL_PREFIX=/home/jetson/catkin_ws/install_isolated

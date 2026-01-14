@@ -1,0 +1,66 @@
+<launch>
+  <!-- 1. YDLidar X4 Pro 라이다 드라이버 실행 -->
+  <node name="ydlidar_lidar_publisher" pkg="ydlidar_ros_driver" type="ydlidar_ros_driver_node" output="screen">
+    <param name="port" type="string" value="/dev/ttyUSB0"/>  
+    <param name="frame_id" type="string" value="laser_frame"/>
+    <param name="ignore_array" type="string" value=""/>
+    <param name="baudrate" type="int" value="128000"/>  
+    <param name="lidar_type" type="int" value="1"/>  
+    <param name="device_type" type="int" value="0"/>  
+    <param name="sample_rate" type="int" value="9"/>
+    <param name="frequency" type="double" value="10.0"/>  
+    <param name="abnormal_check_count" type="int" value="4"/>  
+    <param name="resolution_fixed" type="bool" value="true"/>
+    <param name="auto_reconnect" type="bool" value="true"/>
+    <param name="reversion" type="bool" value="false"/>
+    <param name="inverted" type="bool" value="false"/>
+    <param name="isSingleChannel" type="bool" value="true"/>
+    <param name="intensity" type="bool" value="false"/>
+    <param name="support_motor_dtr" type="bool" value="false"/>
+    <param name="invalid_range_is_inf" type="bool" value="true"/>
+    <param name="point_cloud_preservative" type="bool" value="false"/>
+    <param name="angle_min" type="double" value="-180"/>
+    <param name="angle_max" type="double" value="180"/>
+    <param name="range_min" type="double" value="0.1"/>
+    <param name="range_max" type="double" value="12.0"/>
+  </node>
+
+  <!-- 2. laser_frame → base_footprint 고정 TF -->
+  <node pkg="tf" type="static_transform_publisher" name="base_to_laser"
+        args="0 0 0 0 0 0 base_footprint laser_frame 100" />
+
+  <!-- 3. odom → base_footprint 고정 TF -->
+  <node pkg="final_gmapping" type="static_odom_publisher.py" name="fake_odom" output="screen" />
+
+  <!-- 4. GMapping 실행 -->
+<node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+  <param name="base_frame"           value="base_footprint"/>
+  <param name="odom_frame"           value="odom"/>
+  <param name="map_update_interval"  value="0.5"/>
+
+  <!-- 라이다 유효 범위 설정 -->
+  <param name="maxRange"             value="8.0"/>
+  <param name="maxUrange"            value="8.0"/>
+
+  <!-- 맵 해상도 -->
+  <param name="delta"                value="0.05"/>
+  <param name="particles"            value="80"/>
+  <param name="sigma"                value="0.05"/>
+
+  <!-- 업데이트 조건 (움직임이 감지되어야 업데이트) -->
+  <param name="linearUpdate"         value="0.1"/>   <!-- 10cm 이동 시 업데이트 -->
+  <param name="angularUpdate"        value="0.05"/>  <!-- 약 3도 회전 시 업데이트 -->
+  <param name="temporalUpdate"       value="1.0"/>   <!-- 1초마다 강제 업데이트 -->
+
+  <!-- 중복 방지 스캔 일치 기준 -->
+  <param name="minimumScore"         value="100.0"/>
+  <param name="resampleThreshold"    value="0.5"/>
+  
+  <!-- 오도메트리 불신 설정 -->
+  <param name="srr"                  value="0.1"/>
+  <param name="srt"                  value="0.2"/>
+  <param name="str"                  value="0.1"/>
+  <param name="stt"                  value="0.2"/>
+</node>
+</launch>
+

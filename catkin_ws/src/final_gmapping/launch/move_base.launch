@@ -1,0 +1,22 @@
+<launch>
+  <!-- 1. 공통 costmap 설정 -->
+  <rosparam file="$(find final_gmapping)/config/costmap_common_params.yaml" command="load" ns="move_base/global_costmap"/>
+  <!-- 2. 개별 costmap 설정 -->
+  <rosparam file="$(find final_gmapping)/config/global_costmap_params.yaml" command="load" ns="move_base/global_costmap"/>
+  <rosparam file="$(find final_gmapping)/config/local_costmap_params.yaml" command="load" ns="move_base/local_costmap"/>
+
+  <!-- ✅ 네임스페이스 추가 -->
+  <rosparam file="$(find final_gmapping)/config/base_local_planner_params.yaml" command="load" ns="move_base" />
+
+  <!-- 3. move_base 실행 -->
+  <node name="move_base" pkg="move_base" type="move_base" output="screen">
+    <param name="base_global_planner" value="navfn/NavfnROS"/>
+    <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
+    <param name="recovery_behavior_enabled" value="true"/>
+    <param name="clearing_rotation_allowed" value="true"/>
+  </node>
+  
+  <!-- safety_filter 노드 포함 -->
+  <include file="$(find final_gmapping)/launch/safety_filter.launch"/>
+</launch>
+

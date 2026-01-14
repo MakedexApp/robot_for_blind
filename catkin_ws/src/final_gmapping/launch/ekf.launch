@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" output="screen">
+    <param name="use_sim_time" value="false"/>
+    <rosparam file="$(find final_gmapping)/config/ekf.yaml" command="load"/>
+  </node>
+</launch>
+

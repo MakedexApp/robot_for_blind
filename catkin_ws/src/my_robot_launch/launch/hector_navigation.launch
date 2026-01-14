@@ -1,0 +1,8 @@
+<launch>
+  <!-- Hector SLAM 실행 -->
+  <include file="$(find my_robot_launch)/launch/hector_slam_run.launch" />
+
+  <!-- move_base 실행 -->
+  <include file="$(find my_robot_launch)/launch/move_base.launch" />
+</launch>
+

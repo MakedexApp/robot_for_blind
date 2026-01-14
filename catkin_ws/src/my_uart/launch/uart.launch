@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="my_uart" type="stm32_uart_parser.py" name="stm32_uart_parser" output="screen" />
+</launch>
+

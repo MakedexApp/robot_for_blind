@@ -1,0 +1,33 @@
+<launch>
+  <!-- 1. 라이다 실행 -->
+  <include file="$(find ydlidar_ros_driver)/launch/X4.launch"/>
+
+  <!-- 2. 엔코더 오도메트리 퍼블리셔 (Python 노드 실행) -->
+  <node name="encoder_odometry_publisher"
+        pkg="final_gmapping"
+        type="odometry_publisher.py"
+        output="screen"
+        respawn="true" />
+
+  <!-- 3. Gmapping 실행 -->
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+    <param name="base_frame" value="base_footprint"/>
+    <param name="odom_frame" value="odom"/>
+    <param name="map_update_interval" value="1.0"/>
+    <param name="maxUrange" value="8.0"/>
+    <param name="particles" value="30"/>
+    <param name="delta" value="0.05"/>
+    <param name="linearUpdate" value="0.1"/>
+    <param name="angularUpdate" value="0.1"/>
+    <param name="minimumScore" value="50.0"/>
+  </node>
+
+  <!-- 4. TF: map → odom은 gmapping이 퍼블리시하므로 불필요 -->
+
+  <!-- 5. TF: odom → base_footprint은 odometry_publisher.py에서 브로드캐스트함 -->
+
+  <!-- 6. TF: base_footprint → laser_frame (기울임 보정 포함: z=0.2, 회전 X) -->
+  <node pkg="tf" type="static_transform_publisher" name="base_to_laser" 
+        args="0 0 0.2 0 0 0 /base_footprint /laser_frame 50" />
+</launch>
+

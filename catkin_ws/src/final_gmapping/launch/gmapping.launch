@@ -1,0 +1,28 @@
+<launch>
+  <!-- Lidar 노드 포함 여부 (이미 실행 중이면 주석처리) -->
+  <!-- <include file="$(find ydlidar_ros_driver)/launch/X4.launch"/> -->
+
+  <!-- Gmapping SLAM 실행 -->
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+    <param name="base_frame" value="base_footprint"/>
+    <param name="odom_frame" value="odom"/>
+    <param name="map_update_interval" value="0.1"/>   <!-- 맵을 업데이트하는 주기를 0.1초로 설정 -->
+    <param name="maxUrange" value="4.0"/>   <!-- 라이다 최대 유효 범위를 4.0m로 제한 -->
+    <param name="particles" value="60"/>   <!-- 파티클 필터에서 사용할 파티클 수를 60개로 설정-->
+    <param name="delta" value="0.05"/>   <!-- 맵 그리드 해상도를 0.05m로 설정-->
+    
+    <!-- odometry 없이도 작동하도록 중요 설정 -->
+    <param name="temporalUpdate" value="0.1"/>   <!-- 시간 기반으로 스캔을 수용할 최소 간격을 0.1초로 설정 -->
+    <param name="minimumScore" value="70.0"/>    <!-- 스캔 일치 기준 낮게 -->
+    <param name="linearUpdate" value="0.1"/>     <!-- 직선으로 0.1m 이상 이동하면 맵 업데이트를 시도 -->
+    <param name="angularUpdate" value="0.2"/>    <!-- 회전을 0.2라디안(약 ??도) 이상 하면 맵을 업데이트합니다. 값이 작을수록 회전 변화에 민감하게 반응 -->
+  </node>
+
+  <!-- laser_frame → base_footprint 는 이미 static_transform으로 있음 -->
+
+  <!-- map → odom: 오도메트리 없음 → 임시로 고정 TF 사용 -->
+  <node pkg="tf" type="static_transform_publisher"
+        name="map_to_odom"
+        args="0 0 0 0 0 0 /map /odom 50" />
+</launch>
+

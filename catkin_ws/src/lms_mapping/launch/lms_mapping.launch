@@ -1,0 +1,26 @@
+<launch>
+  <!-- YDLidar X4 라이다 실행 -->
+  <include file="$(find ydlidar_ros_driver)/launch/X4.launch"/>
+
+  <!-- Gmapping SLAM -->
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+    <param name="base_frame" value="base_footprint"/>
+    <param name="odom_frame" value="odom"/>
+    <param name="map_update_interval" value="0.1"/>
+    <param name="maxUrange" value="4.0"/>
+    <param name="particles" value="60"/>
+    <param name="delta" value="0.05"/>
+    <param name="temporalUpdate" value="0.1"/>
+    <param name="minimumScore" value="70.0"/>
+    <param name="linearUpdate" value="0.1"/>
+    <param name="angularUpdate" value="0.2"/>
+  </node>
+
+  <!-- map → odom: 고정 TF (오도메트리 없는 상태용) -->
+  <node pkg="tf" type="static_transform_publisher"
+        name="map_to_odom"
+        args="0 0 0 0 0 0 /map /odom 50" />
+
+  <!-- Flask 기반 모터 제어 웹서버 실행 -->
+  <node pkg="lms_mapping" type="motor_flask_server.py" name="flask_motor" output="screen" launch-prefix="python3"/>
+</launch>

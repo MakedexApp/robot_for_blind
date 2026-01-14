@@ -1,0 +1,61 @@
+<launch>
+  <!-- 1. YDLidar -->
+  <include file="$(find ydlidar_ros_driver)/launch/X4.launch"/>
+
+  <!-- 2. Encoder UART 수신 + /encoder 퍼블리시 -->
+  <node pkg="final_gmapping" type="jetson_uart_flask.py" name="encoder_uart_listener" output="screen">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baudrate" value="115200"/>
+  </node>
+
+  <!-- 3. Odometry 계산 → /odom, TF(odom → base_footprint) -->
+  <node pkg="final_gmapping" type="odometry_publisher.py" name="odometry_publisher" output="screen" />
+
+  <!-- 4. IMU → /imu/data_raw 퍼블리시 -->
+  <node pkg="final_gmapping" type="imu_uart_publisher.py" name="imu_uart_publisher" output="screen">
+    <param name="port" value="/dev/ttyACM1"/>
+    <param name="baudrate" value="115200"/>
+  </node>
+
+  <!-- 5. EKF Localization -->
+  <include file="$(find final_gmapping)/launch/ekf.launch"/>
+
+  <!-- 7. GMapping SLAM -->
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+    <param name="base_frame" value="base_footprint"/>
+    <param name="odom_frame" value="odom"/>
+    <param name="map_update_interval" value="1.0"/>
+    <param name="maxUrange" value="10.0"/>
+    <param name="particles" value="30"/>
+    <param name="delta" value="0.1"/>
+    <param name="linearUpdate" value="0.1"/>
+    <param name="angularUpdate" value="0.1"/>
+    <param name="temporalUpdate" value="0.5"/>
+    <param name="minimumScore" value="60.0"/>
+  </node>
+
+  <!-- 8. AMCL Localization -->
+  <node pkg="amcl" type="amcl" name="amcl" output="screen">
+    <param name="odom_frame_id" value="odom"/>
+    <param name="base_frame_id" value="base_footprint"/>
+    <param name="global_frame_id" value="map"/>
+    <param name="use_map_topic" value="true"/>
+    <param name="update_min_d" value="0.2"/>
+    <param name="update_min_a" value="0.2"/>
+    <param name="min_particles" value="500"/>
+    <param name="max_particles" value="2000"/>
+    <param name="resample_interval" value="1"/>
+    <param name="laser_max_range" value="8.0"/>
+    <param name="laser_min_range" value="0.1"/>
+    <remap from="scan" to="scan"/>
+  </node>
+
+  <!-- 10. Move Base -->
+  <node pkg="move_base" type="move_base" name="move_base" output="screen">
+    <param name="base_global_planner" value="navfn/NavfnROS"/>
+    <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
+    <rosparam file="$(find final_gmapping)/config/costmap_common_params.yaml" command="load" />
+    <rosparam file="$(find final_gmapping)/config/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find final_gmapping)/config/base_local_planner_params.yaml" command="load" />
+  </node>
+</launch>

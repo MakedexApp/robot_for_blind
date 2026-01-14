@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="final_gmapping" type="safety_filter.py" name="safety_filter" output="screen"/>
+</launch>

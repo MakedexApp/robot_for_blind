@@ -1,0 +1,21 @@
+<launch>
+  <!-- 1. YDLidar 라이다 드라이버 실행 -->
+  <include file="$(find ydlidar_ros_driver)/launch/lidar_all.launch"/>
+
+  <!-- 2. base_footprint -> laser_frame 정적 TF -->
+  <node pkg="tf" type="static_transform_publisher" name="base_to_laser" 
+        args="0 0 0 0 0 0 base_footprint laser_frame 100" />
+
+  <!-- 3. 움직이는 odom -> base_footprint TF (dynamic broadcaster) -->
+  <node pkg="my_tf_broadcaster" type="dynamic_tf.py" name="fake_odom_tf" output="screen" />
+
+  <!-- 4. GMapping 실행 (5cm만 움직여도 맵 갱신) -->
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+    <param name="base_frame" value="base_footprint" />
+    <param name="odom_frame" value="odom" />
+    <param name="map_update_interval" value="1.0" />
+    <param name="linearUpdate" value="0.05" />
+    <param name="angularUpdate" value="0.1" />
+    <param name="minimumScore" value="50" />
+  </node>
+</launch>

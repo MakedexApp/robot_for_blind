@@ -1,0 +1,5 @@
+<launch>
+  <!-- 맵 저장 노드 실행: 저장 경로는 ~/map/my_map.* -->
+  <node name="map_saver" pkg="map_server" type="map_saver" args="-f $(env HOME)/map/my_map" />
+</launch>
+

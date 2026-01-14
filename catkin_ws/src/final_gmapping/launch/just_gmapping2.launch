@@ -1,0 +1,42 @@
+<launch>
+  <!-- 1. YDLidar -->
+  <include file="$(find ydlidar_ros_driver)/launch/X4.launch"/>
+
+  <!-- 2. Encoder UART 수신 + /encoder 퍼블리시 -->
+  <node pkg="final_gmapping" type="jetson_uart_flask.py" name="encoder_uart_listener" output="screen">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baudrate" value="115200"/>
+  </node>
+
+  <!-- 3. Odometry 계산 → /odom, TF(odom → base_footprint) -->
+  <node pkg="final_gmapping" type="odometry_publisher.py" name="odometry_publisher" output="screen" />
+
+  <!-- 4. IMU → /imu/data_raw 퍼블리시 (Python3 스크립트) -->
+  <node pkg="final_gmapping" type="imu_uart_publisher.py" name="imu_uart_publisher" output="screen">
+    <param name="port" value="/dev/ttyACM1"/>
+    <param name="baudrate" value="115200"/>
+  </node>
+
+  <!-- 5. EKF Localization → /odometry/filtered, TF(odom → base_footprint) -->
+  <include file="$(find final_gmapping)/launch/ekf.launch"/>
+
+  <!-- 6. static TF: base_footprint → laser_frame -->
+  <!-- 이미 포함되어 있을 가능성 있어서 주석 처리 -->
+  <!-- <node pkg="tf" type="static_transform_publisher" name="base_to_laser"
+        args="0 0 0 0 0 3.14159 base_footprint laser_frame" /> -->
+
+  <!-- 7. GMapping SLAM -->
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+    <param name="base_frame" value="base_footprint"/>
+    <param name="odom_frame" value="odom"/>
+    <param name="map_update_interval" value="1.0"/>
+    <param name="maxUrange" value="4.0"/>
+    <param name="particles" value="30"/>
+    <param name="delta" value="0.5"/>
+    <param name="linearUpdate" value="0.1"/>
+    <param name="angularUpdate" value="0.1"/>
+    <param name="temporalUpdate" value="0.5"/>
+    <param name="minimumScore" value="60.0"/>
+  </node>
+</launch>
+
