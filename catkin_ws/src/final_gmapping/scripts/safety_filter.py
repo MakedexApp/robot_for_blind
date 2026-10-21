@@ -15,14 +15,18 @@ class SafetyFilter:
 
     def scan_callback(self, scan):
         front_ranges = scan.ranges[len(scan.ranges)//2 - 10 : len(scan.ranges)//2 + 10]
-        front_min = min(front_ranges)
+        # invalid_range_is_inf=false 라서 무효 측정값이 0.0으로 들어온다.
+        # 0.0을 그대로 두면 항상 "장애물 있음"으로 판정돼 로봇이 못 움직인다.
+        valid_ranges = [r for r in front_ranges if r > 0.0]
+        if not valid_ranges:
+            return
+        front_min = min(valid_ranges)
 
         self.obstacle_close = front_min < SAFE_DISTANCE
 
     def cmd_callback(self, msg):
         if self.obstacle_close:
-            stop = Twist()  # 정지
-            self.cmd_pub.publish(그만)
+            self.cmd_pub.publish(Twist())  # 정지
         else:
             self.cmd_pub.publish(msg)  # 통과
             self.last_cmd = msg
@@ -31,4 +35,3 @@ if __name__ == '__main__':
     rospy.init_node('safety_filter')
     SafetyFilter()
     rospy.spin()
-

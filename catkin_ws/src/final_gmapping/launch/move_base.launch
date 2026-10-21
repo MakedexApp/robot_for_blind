@@ -14,6 +14,8 @@
     <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
     <param name="recovery_behavior_enabled" value="true"/>
     <param name="clearing_rotation_allowed" value="true"/>
+    <!-- safety_filter가 /cmd_vel_raw를 가로채서 장애물 체크 후 /cmd_vel로 내보낸다 -->
+    <remap from="/cmd_vel" to="/cmd_vel_raw"/>
   </node>
   
   <!-- safety_filter 노드 포함 -->
